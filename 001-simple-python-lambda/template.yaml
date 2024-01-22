@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Simple python based Lambda function
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  SimplePythonLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: simple-python-lambda
+      Description: Simple python based Lambda function using AWS SAM
+      Handler: lambda_function.lambda_handler 
+      CodeUri: src/
+      Runtime: python3.12
+      MemorySize: 512
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Architectures:
+        - x86_64
+
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: simple-python-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+Outputs:
+  SimplePythonLambda:
+    Description: "Simple Python Lambda Function ARN"
+    Value: !GetAtt SimplePythonLambda.Arn
+  LambdaFunctionRole:
+    Description: "IAM Role created for Lambda function"
+    Value: !GetAtt LambdaFunctionRole.Arn
+
+
