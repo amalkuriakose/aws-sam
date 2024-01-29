@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Simple nodejs based Lambda function
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  SimpleNodeLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: simple-nodejs-lambda
+      Description: Simple nodejs based Lambda function using AWS SAM
+      Handler: lambda_function.lambda_handler 
+      CodeUri: src/
+      Runtime: nodejs20.x
+      MemorySize: 512
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Architectures:
+        - x86_64
+
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: simple-node-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+Outputs:
+  SimpleNodeLambda:
+    Description: "Simple Python Lambda Function ARN"
+    Value: !GetAtt SimpleNodeLambda.Arn
+  LambdaFunctionRole:
+    Description: "IAM Role created for Lambda function"
+    Value: !GetAtt LambdaFunctionRole.Arn
+
+
