@@ -1,17 +1,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Description: SQS Lambda event source mapping
+Description: SNS Lambda event source mapping
 
 Globals:
   Function:
     Timeout: 30
 
 Resources:
-  SqsQueue:
-    Type: AWS::SQS::Queue
-    Properties: 
-      QueueName: "MyQueue"
+  SnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: "my-topic"
 
   LambdaFunctionRole:
     Type: AWS::IAM::Role
@@ -26,17 +26,6 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies:
-        - PolicyName: sqs-lambda-policy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "sqs:ReceiveMessage"
-                  - "sqs:DeleteMessage"
-                  - "sqs:GetQueueAttributes"
-                Resource: '*'
 
   SimplePythonLambda:
     Type: AWS::Serverless::Function
@@ -51,10 +40,10 @@ Resources:
       Architectures:
         - x86_64
       Events:
-        SqsEvent:
-          Type: SQS
+        SNSEvent:
+          Type: SNS
           Properties:
-            Queue: !GetAtt SqsQueue.Arn
+            Topic: !GetAtt SnsTopic.TopicArn
 
 Outputs:
   SimplePythonLambda:
@@ -63,8 +52,8 @@ Outputs:
   LambdaFunctionRole:
     Description: "IAM Role created for Lambda function"
     Value: !GetAtt LambdaFunctionRole.Arn
-  SqsQueue:
-    Description: "SQS Queue"
-    Value: !GetAtt SqsQueue.Arn
+  SnsTopic:
+    Description: "SNS Topic"
+    Value: !GetAtt SnsTopic.TopicArn
 
 
